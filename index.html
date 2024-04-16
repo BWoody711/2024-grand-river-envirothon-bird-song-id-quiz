@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>2024 Grand River Envirothon Bird Song ID Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .large-icon {
+            width: 64px; /* Adjust the width as needed */
+            height: 64px; /* Adjust the height as needed */
+        }
+
+        body {
+            background-color: rgb(0, 96, 0);
+
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: white;
+        }
+
+        .card {
+            background-color: rgb(111, 165, 30);
+            border-color: rgb(111, 165, 30);
+        }
+
+        .btn-secondary {
+            background-color: rgb(0, 96, 0); /* Change this to your desired color */
+            border-color: rgb(0, 96, 0);
+            color: #fff; /* Text color */
+        }
+
+            /* Optionally, you can style the button on hover or focus */
+        .btn-secondary:hover,
+        .btn-secondary:focus,
+        .btn-secondary:active,
+        .btn-secondary:disabled {
+            background-color: rgb(111, 165, 30); /* Change this to your desired color on hover/focus */
+            border-color: rgb(111, 165, 30);
+        }
+    </style>
+    <script>
+
+        const API_KEY = 'AIzaSyDXDDbsQ-23_DsUD0ClyIppVuILn1Psu24'
+        const SPREADSHEET_ID = '15wgdQrxHI5EOh3WNGP0fv2Qrg8KfyhCR-__2aKEAZBk';
+        const SHEET_NAME = 'Randomized';
+
+        // Function to fetch data from Google Sheets
+        function fetchData() {
+        fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`)
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('container');
+                container.innerHTML = ''; // Clear previous data
+                data.values.forEach(row => {
+                    if (row[1] !== "ID") {
+                        const card = document.createElement('div');
+                        card.style = "align-self: center; justify-content: center;"
+                        card.className="card"
+                        const cardBody = document.createElement('div');
+                        cardBody.className="card-body"
+                        cardBody.style = "justify-content: center; align-items: center; padding: 1.25vh;"
+                        const cardTitle = document.createElement('h5')
+                        cardTitle.className="card-title"
+                        cardTitle.style = "display: flex; justify-self: center; align-self: center; width: 100%; font-size: 3vh; margin: 0; padding-bottom: 1vh"
+                        cardTitle.textContent = "Question " + row[0]
+                        const audio = document.createElement('button')
+                        audio.classList.add("btn", "btn-success")
+                        audio.style="width: 100%; height: 12vh;"
+                        audio.id = row[1]
+                        audio.addEventListener("click", function() {
+                            if(document.getElementById("audioPlayer")) {
+                                sound = document.getElementById("audioPlayer")
+                                if (!sound.paused) { // Check if audio is currently playing
+                                    sound.pause()
+                                    sound.currentTime = 0;
+                                }
+                                const soundUrl = 'https://www.bird-sounds.net/sounds/' + audio.id + '.mp3'
+                                if (sound.src !== soundUrl) {
+                                    sound.src = soundUrl
+                                    sound.play();
+                                }
+                                sound.addEventListener("error", function() {
+                                    alert("Failed to load audio file " + sound.src);
+                                    sound.pause()
+                                    sound.currentTime = 0;
+                                });
+                            }
+                        })
+                        
+                        var iconElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                        iconElement.setAttribute("fill", "currentColor");
+                        iconElement.classList.add("bi", "bi-volume-up-fill", "large-icon");
+                        iconElement.setAttribute("viewBox", "0 0 16 16");
+
+                        // Create an inner path element for the icon
+                        const paths = ["M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z", "M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89z", "M8.707 11.182A4.5 4.5 0 0 0 10.025 8a4.5 4.5 0 0 0-1.318-3.182L8 5.525A3.5 3.5 0 0 1 9.025 8 3.5 3.5 0 0 1 8 10.475zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06"]
+
+                        paths.forEach(path => {
+                            const innerPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                            innerPath.setAttribute("d", path);
+                            iconElement.appendChild(innerPath);
+                        })
+
+                        audio.appendChild(iconElement)
+                        cardBody.appendChild(cardTitle)
+                        cardBody.appendChild(audio)
+                        card.appendChild(cardBody)
+                        container.appendChild(card);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }
+
+        // Call the function to fetch data when the page loads
+        window.onload = fetchData;
+    </script>
+  </head>
+  <body>
+    <h2 style="height: 9vh; display: flex; justify-content: center; align-items: center; padding-left: 2vh; padding-right: 2vh; margin: 0;">2024 Grand River Envirothon Bird Song ID Quiz</h2>
+    <div id="container" style="top: 9vh; display: grid; grid-template-columns: auto auto auto; grid-template-rows: auto auto auto auto; gap: 0.5vh; height: 91vh; width: 100%; padding-left: 2vh; padding-right: 2vh">
+    
+    </div>
+    <audio control id="audioPlayer" src="" type="audio/mp3" style="display: hidden;">
+    </audio>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+  </body>
+</html>
