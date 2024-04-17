@@ -76,7 +76,13 @@
                                     sound.pause()
                                     sound.currentTime = 0;
                                 }
-                                const soundUrl = 'https://www.bird-sounds.net/sounds/' + audio.id + '.mp3'
+                                let soundUrl
+                                if (audio.id.startsWith('http')) {
+                                    soundUrl = audio.id
+                                }
+                                else {
+                                    soundUrl = 'https://www.bird-sounds.net/sounds/' + audio.id + '.mp3'
+                                }
                                 if (sound.src !== soundUrl) {
                                     sound.src = soundUrl
                                     sound.play();
